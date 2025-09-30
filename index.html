@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ToriBOX - Short Drama App</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1>Binge Short Dramas. Anytime. Anywhere.</h1>
+        <h2>Africa’s first mobile-first short drama app</h2>
+        <p>Fast, addictive, local stories.</p>
+        <form class="signup-form" id="waitlist-form">
+          <input type="email" id="email" name="user_email" placeholder="Your email" required>
+          <button type="submit" id="submitBtn">Join the Waitlist</button>
+        </form>
+        <p id="statusMsg" style="margin-top:10px; font-size:0.9rem;"></p>
+      </div>
+      <div class="hero-image">
+        <img src="phone-1.png" alt="App preview">
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features">
+    <div class="container">
+      <div class="section-header">
+        <h2>What is <img src="logo.png" alt="" class="logo"> ToriBOX?</h2>
+        <p>Discover the key features that make ToriBOX unique.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="icon">🎬</div>
+          <h3>Fresh Naija Dramas</h3>
+          <p>Bite-sized stories, straight from our culture.</p>
+        </div>
+        <div class="feature-card">
+          <div class="icon">📱</div>
+          <h3>Made for Mobile</h3>
+          <p>Watch in minutes, perfect for commutes and breaks.</p>
+        </div>
+        <div class="feature-card">
+          <div class="icon">👥</div>
+          <h3>Community Driven</h3>
+          <p>You help shape what comes next.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NOLLYWOOD -->
+  <section class="nollywood">
+    <div class="container">
+      <div class="nollywood-content">
+        <div class="nollywood-text">
+          <h2>ToriBOX.</h2>
+          <p>Big stories. 
+Small episodes. 
+Endless drama..</p>
+        </div>
+        <div class="nollywood-image">
+          <img src="phone-2.png" alt="App preview">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WAITLIST CTA -->
+  <section class="stats">
+    <div class="container">
+      <div class="stats-content">
+        <h2>Over 1,000+ users already joined the waitlist</h2>
+        <p>Get exclusive access to Africa’s first short drama app when we launch.</p>
+        <button class="cta-button">Join Now</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- EmailJS -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <script>
+    (function(){
+      emailjs.init("tZVdYUvVXRrtG9yeo"); // ✅ Your Public Key
+    })();
+
+    const form = document.getElementById("waitlist-form");
+    const statusMsg = document.getElementById("statusMsg");
+    const submitBtn = document.getElementById("submitBtn");
+
+    form.addEventListener("submit", function(e){
+      e.preventDefault();
+      const email = document.getElementById("email").value.trim();
+      if(!email) return;
+
+      submitBtn.disabled = true;
+      statusMsg.style.color = "black";
+      statusMsg.innerText = "⏳ Checking if you're already on the waitlist...";
+
+      // Check if email already exists
+      fetch("/search?user_email=" + encodeURIComponent(email))
+        .then(res => res.json())
+        .then(data => {
+          if(data.length > 0) throw new Error("This email is already on the waitlist.");
+
+          // Send email via EmailJS
+          return emailjs.send("service_bmq3xk1", "template_5wkb128", { user_email: email })
+            .then(() => emailjs.send("service_bmq3xk1", "template_9k7o036", { user_email: email }));
+        })
+        .then(() => {
+          // Store email in SheetDB
+          return fetch("https://sheetdb.io/api/v1/uk4ms72c90n0y", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ data: { user_email: email } })
+          });
+        })
+        .then(() => {
+          statusMsg.style.color = "limegreen";
+          statusMsg.innerText = "🎉 Thanks! You're on the waitlist. Check your inbox for confirmation.";
+          form.reset();
+        })
+        .catch(err => {
+          statusMsg.style.color = "red";
+          statusMsg.innerText = err.message || "❌ Something went wrong. Try again.";
+          console.error(err);
+        })
+        .finally(() => {
+          submitBtn.disabled = false;
+        });
+    });
+  </script>
+</body>
+</html>
