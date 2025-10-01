@@ -61,9 +61,7 @@
       <div class="nollywood-content">
         <div class="nollywood-text">
           <h2>ToriBOX.</h2>
-          <p>Big stories. 
-Small episodes. 
-Endless drama..</p>
+          <p>Big stories.<br>Small episodes.<br>Endless drama.</p>
         </div>
         <div class="nollywood-image">
           <img src="phone-2.png" alt="App preview">
@@ -87,7 +85,7 @@ Endless drama..</p>
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <script>
     (function(){
-      emailjs.init("tZVdYUvVXRrtG9yeo"); // ✅ Your Public Key
+      emailjs.init("tZVdYUvVXRrtG9yeo"); // ✅ Your EmailJS Public Key
     })();
 
     const form = document.getElementById("waitlist-form");
@@ -103,18 +101,18 @@ Endless drama..</p>
       statusMsg.style.color = "black";
       statusMsg.innerText = "⏳ Checking if you're already on the waitlist...";
 
-      // Check if email already exists
-      fetch("/search?user_email=" + encodeURIComponent(email))
+      // ✅ 1. Check if email already exists in SheetDB
+      fetch("https://sheetdb.io/api/v1/uk4ms72c90n0y/search?user_email=" + encodeURIComponent(email))
         .then(res => res.json())
         .then(data => {
-          if(data.length > 0) throw new Error("This email is already on the waitlist.");
+          if (data.length > 0) throw new Error("⚠️ This email is already on the waitlist.");
 
-          // Send email via EmailJS
-          return emailjs.send("service_bmq3xk1", "template_5wkb128", { user_email: email })
-            .then(() => emailjs.send("service_bmq3xk1", "template_9k7o036", { user_email: email }));
+          // ✅ 2. Send email via EmailJS (to you + auto-reply)
+          return emailjs.send("service_owazis7", "template_5wkb128", { user_email: email })
+            .then(() => emailjs.send("service_owazis7", "template_9k7o036", { user_email: email }));
         })
         .then(() => {
-          // Store email in SheetDB
+          // ✅ 3. Save email into SheetDB
           return fetch("https://sheetdb.io/api/v1/uk4ms72c90n0y", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
