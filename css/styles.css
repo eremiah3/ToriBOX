@@ -220,7 +220,7 @@ body {
   border-radius: 16px;
   /* box-shadow: 0 15px 30px rgba(0,0,0,0.1); */
   position: absolute;
-  bottom: -320px; /* float into stats */
+  bottom: -380px; /* float into stats */
   right: 0;
   z-index: 15;
 }
