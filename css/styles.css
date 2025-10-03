@@ -325,8 +325,12 @@ body {
   align-items: left;
   /* justify-content: center; */
   /* transition: background 0.3s; */
-  width: 130px;
+  width: 110px;
   margin-left: -100px;
+}
+.cta-button a{
+  text-decoration: none;
+  color: #000;
 }
 }
 
@@ -370,10 +374,13 @@ body {
   align-items: left;
   /* justify-content: center; */
   /* transition: background 0.3s; */
-  width: 150px;
+  width: 120px;
   margin-left: -100px;
 }
-
+.cta-button a{
+  text-decoration: none;
+  color: #000;
+}
 }
 
 @media (max-width: 480px) {
@@ -400,6 +407,10 @@ body {
   justify-content: center;
   transition: background 0.3s;
 }
+.cta-button a{
+  text-decoration: none;
+  color: #000;
+}
 }
 
 @media (max-width: 360px) {
@@ -421,5 +432,9 @@ body {
   align-items: center;
   justify-content: center;
   transition: background 0.3s;
+}
+.cta-button a{
+  text-decoration: none;
+  color: #000;
 }
 }
