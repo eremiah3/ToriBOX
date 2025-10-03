@@ -20,7 +20,7 @@
           <input type="email" id="email" name="user_email" placeholder="Your email" required>
           <button type="submit" id="submitBtn">Join the Waitlist</button>
         </form>
-        <p id="statusMsg" style="margin-top:10px; font-size:0.9rem;"></p>
+        <p id="statusMsg" style="margin-top:10px; font-size:0.6rem;"></p>
       </div>
       <div class="hero-image">
         <img src="phone-1.png" alt="App preview">
@@ -121,7 +121,7 @@
           });
         })
         .then(() => {
-          statusMsg.style.color = "limegreen";
+          statusMsg.style.color = "black";
           statusMsg.innerText = "🎉 Thanks! You're on the waitlist. Check your inbox for confirmation.";
           form.reset();
         })
