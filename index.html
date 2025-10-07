@@ -14,7 +14,7 @@
     <div class="hero-content">
       <div class="hero-text" id="wait">
         <h1>Binge Short Dramas. Anytime. Anywhere.</h1>
-        <h2>Africa’s first mobile-first short drama app</h2>
+        <h2>Africa's first mobile-first short drama app</h2>
         <p>Fast, addictive, local stories.</p>
         <form class="signup-form" id="waitlist-form">
           <input type="email" id="email" name="user_email" placeholder="Your email" required>
@@ -55,6 +55,45 @@
     </div>
   </section>
 
+  <!-- COIN PACKS -->
+  <section class="coin-packs">
+    <div class="container">
+      <div class="section-header">
+        <h2>Already 1,000+ drama lovers signed up.<br>100+ have reserved coins</h2>
+        <p>Unlock premium content and support your favorite creators with ToriBOX Coins!</p>
+      </div>
+
+      <div class="pack-grid">
+        <!-- Day-One Pack -->
+        <div class="pack-card">
+          <h3>₦500</h3>
+          <h4>Day-One Pack</h4>
+          <p class="coins">100 Coins</p>
+          <p>Be part of the first wave of ToriBOX supporters</p>
+          <button class="pay-btn" onclick="payWithPaystack(500, 'Day-One Pack', 100)">Buy Now</button>
+        </div>
+
+        <!-- Super Fan Pack -->
+        <div class="pack-card">
+          <h3>₦2,000</h3>
+          <h4>Super Fan Pack</h4>
+          <p class="coins">300 Coins <span>(+20% bonus)</span></p>
+          <p>Early supporter shoutout + exclusive sticker pack</p>
+          <button class="pay-btn" onclick="payWithPaystack(2000, 'Super Fan Pack', 300)">Buy Now</button>
+        </div>
+
+        <!-- True Fan Pack -->
+        <div class="pack-card">
+          <h3>₦3,000</h3>
+          <h4>True Fan Pack</h4>
+          <p class="coins">700 Coins <span>(+40% bonus)</span></p>
+          <p>Exclusive sticker pack + early previews of new series</p>
+          <button class="pay-btn" onclick="payWithPaystack(3000, 'True Fan Pack', 700)">Buy Now</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- NOLLYWOOD -->
   <section class="nollywood">
     <div class="container">
@@ -75,9 +114,8 @@
     <div class="container">
       <div class="stats-content">
         <h2>Over 1,000+ users already <br> joined the waitlist</h2>
-        <p>Get exclusive access to Africa’s first <br> short drama app when we launch.</p>
-         <!-- <button class="cta-button" href="#waitlist-form">Join Now</button> -->
-       <button  class="cta-button"><a href="#wait">Join Now</a></button>
+        <p>Get exclusive access to Africa's first <br> short drama app when we launch.</p>
+        <button class="cta-button"><a href="#wait">Join Now</a></button>
       </div>
     </div>
   </section>
@@ -85,55 +123,95 @@
   <!-- EmailJS -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <script>
-    (function(){
-      emailjs.init("tZVdYUvVXRrtG9yeo"); // ✅ Your EmailJS Public Key
-    })();
+    // Initialize EmailJS
+    emailjs.init("mm0hGZXC5mxVDnLGc"); // ✅ Your EmailJS public key
 
     const form = document.getElementById("waitlist-form");
     const statusMsg = document.getElementById("statusMsg");
     const submitBtn = document.getElementById("submitBtn");
+    const SHEETDB_URL = "https://sheetdb.io/api/v1/ip8mw6as947hf";
 
-    form.addEventListener("submit", function(e){
+    form.addEventListener("submit", async function(e) {
       e.preventDefault();
       const email = document.getElementById("email").value.trim();
-      if(!email) return;
+      if (!email) return;
 
       submitBtn.disabled = true;
       statusMsg.style.color = "black";
-      statusMsg.innerText = "⏳ Checking if you're already on the waitlist...";
+      statusMsg.innerText = "⏳ Checking waitlist...";
 
-      // ✅ 1. Check if email already exists in SheetDB
-      fetch("https://sheetdb.io/api/v1/uk4ms72c90n0y/search?user_email=" + encodeURIComponent(email))
-        .then(res => res.json())
-        .then(data => {
-          if (data.length > 0) throw new Error("⚠️ This email is already on the waitlist.");
+      try {
+        // 1️⃣ Check if email already exists in SheetDB
+        const searchRes = await fetch(`${SHEETDB_URL}/search?user_email=${encodeURIComponent(email)}`);
+        let existing = [];
+        if (searchRes.status === 404) {
+          existing = [];
+        } else if (!searchRes.ok) {
+          throw new Error("Could not check waitlist. Try again later.");
+        } else {
+          const data = await searchRes.json();
+          existing = Array.isArray(data) ? data : (data.data || []);
+        }
 
-          // ✅ 2. Send email via EmailJS (to you + auto-reply)
-          return emailjs.send("service_owazis7", "template_5wkb128", { user_email: email })
-            .then(() => emailjs.send("service_owazis7", "template_9k7o036", { user_email: email }));
-        })
-        .then(() => {
-          // ✅ 3. Save email into SheetDB
-          return fetch("https://sheetdb.io/api/v1/uk4ms72c90n0y", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ data: { user_email: email } })
-          });
-        })
-        .then(() => {
-          statusMsg.style.color = "black";
-          statusMsg.innerText = "🎉 Thanks! You're on the waitlist. Check your inbox for confirmation.";
-          form.reset();
-        })
-        .catch(err => {
-          statusMsg.style.color = "red";
-          statusMsg.innerText = err.message || "❌ Something went wrong. Try again.";
-          console.error(err);
-        })
-        .finally(() => {
-          submitBtn.disabled = false;
+        if (existing.length > 0) throw new Error("⚠️ This email is already on the waitlist.");
+
+        // 2️⃣ Send emails: auto-reply to user + notify admin
+        await emailjs.send("service_w60c5jf", "template_36f08lc", { 
+          user_email: email,
+          from_name: "ToriBOX Team",  // ✅ Sender name for user auto-reply
+          reply_to: "support@tori-box.com" // Optional reply-to
         });
+
+        await emailjs.send("service_w60c5jf", "template_kaa01dh", { 
+          user_email: email,
+          from_name: "ToriBOX Team",  // ✅ Sender name for admin notification
+          reply_to: "support@tori-box.com" // Optional reply-to
+        });
+
+        // 3️⃣ Save email to SheetDB (correct format)
+        const saveRes = await fetch(SHEETDB_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ data: { user_email: email } })
+        });
+        if (!saveRes.ok) throw new Error("Failed to save to SheetDB.");
+
+        statusMsg.style.color = "green";
+        statusMsg.innerText = "🎉 Thanks! You're on the waitlist. Check your inbox for confirmation.";
+        form.reset();
+
+      } catch (err) {
+        console.error(err);
+        statusMsg.style.color = "red";
+        statusMsg.innerText = err.message || "❌ Something went wrong. Try again.";
+      } finally {
+        submitBtn.disabled = false;
+      }
     });
+  </script>
+
+  <!-- Paystack Payment Script -->
+  <script src="https://js.paystack.co/v1/inline.js"></script>
+  <script>
+    function payWithPaystack(amount, packName, coins) {
+      let handler = PaystackPop.setup({
+        key: 'pk_test_1234567890abcdef', // Trial Paystack public key (replace with your own)
+        email: document.getElementById('email').value || 'user@example.com', // Use email from waitlist if available
+        amount: amount * 100, // Amount in kobo
+        currency: 'NGN',
+        ref: 'tori-box-' + Math.floor((Math.random() * 1000000000) + 1),
+        callback: function(response) {
+          // Payment successful
+          alert(`Success! Payment for ${packName} (${coins} coins) completed. Reference: ${response.reference}`);
+          // Here you can save to database, send confirmation email, etc.
+          console.log('Payment successful:', response);
+        },
+        onClose: function() {
+          alert('Payment cancelled. You can try again.');
+        }
+      });
+      handler.openIframe();
+    }
   </script>
 </body>
 </html>
