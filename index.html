@@ -14,7 +14,7 @@
         defaults: '2025-05-24',
         person_profiles: 'identified_only', // or 'always' to create profiles for anonymous users as well
     })
-</script>
+  </script>
 </head>
 <body>
   <!-- HERO -->
@@ -78,7 +78,7 @@
           <h4>Day-One Pack</h4>
           <p class="coins">100 Coins</p>
           <p>Be part of the first wave of ToriBOX supporters</p>
-          <!-- <button class="pay-btn" onclick="payWithPaystack(500, 'Day-One Pack', 100)">Buy Now</button> -->
+          <button class="pay-btn" onclick="payWithFlutterwave(1000, 'Day-One Pack', 100)">Buy Now</button>
         </div>
 
         <!-- Super Fan Pack -->
@@ -87,7 +87,7 @@
           <h4>Super Fan Pack</h4>
           <p class="coins">300 Coins <span>(+20% bonus)</span></p>
           <p>Early supporter shoutout + exclusive sticker pack</p>
-          <!-- <button class="pay-btn" onclick="payWithPaystack(2000, 'Super Fan Pack', 300)">Buy Now</button> -->
+          <button class="pay-btn" onclick="payWithFlutterwave(2500, 'Super Fan Pack', 300)">Buy Now</button>
         </div>
 
         <!-- True Fan Pack -->
@@ -96,7 +96,7 @@
           <h4>True Fan Pack</h4>
           <p class="coins">700 Coins <span>(+40% bonus)</span></p>
           <p>Exclusive sticker pack + early previews of new series</p>
-          <!-- <button class="pay-btn" onclick="payWithPaystack(3000, 'True Fan Pack', 700)">Buy Now</button> -->
+          <button class="pay-btn" onclick="payWithFlutterwave(3000, 'True Fan Pack', 700)">Buy Now</button>
         </div>
       </div>
     </div>
@@ -166,17 +166,17 @@
         // 2️⃣ Send emails: auto-reply to user + notify admin
         await emailjs.send("service_w60c5jf", "template_36f08lc", { 
           user_email: email,
-          from_name: "ToriBOX Team",  // ✅ Sender name for user auto-reply
-          reply_to: "support@tori-box.com" // Optional reply-to
+          from_name: "ToriBOX Team",  
+          reply_to: "support@tori-box.com"
         });
 
         await emailjs.send("service_w60c5jf", "template_kaa01dh", { 
           user_email: email,
-          from_name: "ToriBOX Team",  // ✅ Sender name for admin notification
-          reply_to: "support@tori-box.com" // Optional reply-to
+          from_name: "ToriBOX Team",  
+          reply_to: "support@tori-box.com"
         });
 
-        // 3️⃣ Save email to SheetDB (correct format)
+        // 3️⃣ Save email to SheetDB
         const saveRes = await fetch(SHEETDB_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -198,28 +198,31 @@
     });
   </script>
 
-  <!-- Paystack Payment Script -->
-  <script src="https://js.paystack.co/v1/inline.js"></script>
+  <!-- Flutterwave Payment Script -->
+  <script src="https://checkout.flutterwave.com/v3.js"></script>
   <script>
-    function payWithPaystack(amount, packName, coins) {
-      let handler = PaystackPop.setup({
-        key: 'pk_test_1234567890abcdef', // Trial Paystack public key (replace with your own)
-        email: document.getElementById('email').value || 'user@example.com', // Use email from waitlist if available
-        amount: amount * 100, // Amount in kobo
+    function payWithFlutterwave(amount, packName, coins) {
+      FlutterwaveCheckout({
+        public_key: 'FLWPUBK-c8dfd9660a2055246884fc85f1686c3d-X', // Replace with your Flutterwave public key
+        tx_ref: 'tori-box-' + Math.floor((Math.random() * 1000000000) + 1),
+        amount: amount,
         currency: 'NGN',
-        ref: 'tori-box-' + Math.floor((Math.random() * 1000000000) + 1),
-        callback: function(response) {
+        payment_options: 'card, bank, ussd, mobilemoneyghana, mobilemoneyuganda, mobilemoneyzambia, barter, nqr',
+        customer: {
+          email: document.getElementById('email').value || 'user@example.com',
+          name: 'ToriBOX User'
+        },
+        callback: function (response) {
           // Payment successful
-          alert(`Success! Payment for ${packName} (${coins} coins) completed. Reference: ${response.reference}`);
-          // Here you can save to database, send confirmation email, etc.
+          alert(`Success! Payment for ${packName} (${coins} coins) completed. Transaction ID: ${response.transaction_id}`);
           console.log('Payment successful:', response);
+          // Extend this callback to save transaction or send confirmation email
         },
         onClose: function() {
           alert('Payment cancelled. You can try again.');
         }
       });
-      handler.openIframe();
     }
   </script>
 </body>
-</html>
+</html> 
