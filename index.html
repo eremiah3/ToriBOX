@@ -7,12 +7,43 @@
   <title>ToriBOX - Short Drama App</title>
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 5px;
+      text-align: center;
+    }
+    #payment-email {
+      width: 80%;
+      padding: 10px;
+      margin: 10px 0;
+    }
+    .modal-buttons {
+      margin-top: 10px;
+    }
+    .modal-buttons button {
+      padding: 5px 15px;
+      margin: 0 5px;
+    }
+  </style>
   <script>
     !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Fe Us zs Oe js Ns capture Ze calculateEventProperties Hs register register_once register_for_session unregister unregister_for_session Js getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty Gs qs createPersonProfile Vs As Ks opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing Bs debug L Ws getPageViewId captureTraceFeedback captureTraceMetric".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
     posthog.init('phc_NKhAsYlNUzB5H3cnpcSBwhqzNYkp9K26TidLNaJHo8U', {
         api_host: 'https://us.i.posthog.com',
         defaults: '2025-05-24',
-        person_profiles: 'identified_only', // or 'always' to create profiles for anonymous users as well
+        person_profiles: 'identified_only',
     })
   </script>
 </head>
@@ -78,7 +109,7 @@
           <h4>Day-One Pack</h4>
           <p class="coins">100 Coins</p>
           <p>Be part of the first wave of ToriBOX supporters</p>
-          <button class="pay-btn" onclick="payWithFlutterwave(1000, 'Day-One Pack', 100)">Buy Now</button>
+          <button class="pay-btn" onclick="showPaymentPopup(1000, 'Day-One Pack', 100)">Buy Now</button>
         </div>
 
         <!-- Super Fan Pack -->
@@ -87,7 +118,7 @@
           <h4>Super Fan Pack</h4>
           <p class="coins">300 Coins <span>(+20% bonus)</span></p>
           <p>Early supporter shoutout + exclusive sticker pack</p>
-          <button class="pay-btn" onclick="payWithFlutterwave(2500, 'Super Fan Pack', 300)">Buy Now</button>
+          <button class="pay-btn" onclick="showPaymentPopup(2500, 'Super Fan Pack', 300)">Buy Now</button>
         </div>
 
         <!-- True Fan Pack -->
@@ -96,7 +127,7 @@
           <h4>True Fan Pack</h4>
           <p class="coins">700 Coins <span>(+40% bonus)</span></p>
           <p>Exclusive sticker pack + early previews of new series</p>
-          <button class="pay-btn" onclick="payWithFlutterwave(3000, 'True Fan Pack', 700)">Buy Now</button>
+          <button class="pay-btn" onclick="showPaymentPopup(3000, 'True Fan Pack', 700)">Buy Now</button>
         </div>
       </div>
     </div>
@@ -128,8 +159,23 @@
     </div>
   </section>
 
+  <!-- Payment Modal -->
+  <div id="payment-modal" class="modal">
+    <div class="modal-content">
+      <h3>Enter Your Email for Payment</h3>
+      <input type="email" id="payment-email" placeholder="Your email" required>
+      <div class="modal-buttons">
+        <button onclick="proceedWithPayment()">Proceed</button>
+        <button onclick="closePaymentPopup()">Cancel</button>
+      </div>
+      <p id="modal-status" style="margin-top:10px; font-size:0.6rem;"></p>
+    </div>
+  </div>
+
   <!-- EmailJS -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <!-- Flutterwave Payment Script -->
+  <script src="https://checkout.flutterwave.com/v3.js"></script>
   <script>
     // Initialize EmailJS
     emailjs.init("mm0hGZXC5mxVDnLGc"); // ✅ Your EmailJS public key
@@ -196,33 +242,73 @@
         submitBtn.disabled = false;
       }
     });
-  </script>
 
-  <!-- Flutterwave Payment Script -->
-  <script src="https://checkout.flutterwave.com/v3.js"></script>
-  <script>
-    function payWithFlutterwave(amount, packName, coins) {
+    // Modal Functions
+    let currentAmount, currentPackName, currentCoins;
+    function showPaymentPopup(amount, packName, coins) {
+      currentAmount = amount;
+      currentPackName = packName;
+      currentCoins = coins;
+      document.getElementById('payment-modal').style.display = 'flex';
+      document.getElementById('payment-email').focus();
+    }
+
+    function closePaymentPopup() {
+      document.getElementById('payment-modal').style.display = 'none';
+      document.getElementById('payment-email').value = '';
+      document.getElementById('modal-status').innerText = '';
+    }
+
+    function proceedWithPayment() {
+      const emailInput = document.getElementById('payment-email');
+      const email = emailInput.value.trim();
+      const modalStatus = document.getElementById('modal-status');
+
+      if (!email) {
+        modalStatus.style.color = "red";
+        modalStatus.innerText = "Please enter a valid email.";
+        return;
+      }
+
+      modalStatus.style.color = "black";
+      modalStatus.innerText = "Processing payment...";
+      closePaymentPopup();
+
       FlutterwaveCheckout({
         public_key: 'FLWPUBK-c8dfd9660a2055246884fc85f1686c3d-X', // Replace with your Flutterwave public key
         tx_ref: 'tori-box-' + Math.floor((Math.random() * 1000000000) + 1),
-        amount: amount,
+        amount: currentAmount,
         currency: 'NGN',
         payment_options: 'card, bank, ussd, mobilemoneyghana, mobilemoneyuganda, mobilemoneyzambia, barter, nqr',
         customer: {
-          email: document.getElementById('email').value || 'user@example.com',
+          email: email,
           name: 'ToriBOX User'
         },
+        meta: {
+          coins: currentCoins,
+          packName: currentPackName
+        },
         callback: function (response) {
-          // Payment successful
-          alert(`Success! Payment for ${packName} (${coins} coins) completed. Transaction ID: ${response.transaction_id}`);
-          console.log('Payment successful:', response);
-          // Extend this callback to save transaction or send confirmation email
+          if (response.status === 'successful') {
+            const paymentDetails = {
+              email: email,
+              amount: currentAmount,
+              coins: currentCoins,
+              transactionId: response.transaction_id,
+              packName: currentPackName,
+              date: new Date().toISOString()
+            };
+            console.log('Payment Details:', paymentDetails);
+            alert(`Payment Successful!\nEmail: ${email}\nAmount: ₦${currentAmount}\nCoins: ${currentCoins}\nTransaction ID: ${response.transaction_id}`);
+          } else {
+            alert('Payment failed or was not completed.');
+          }
         },
         onClose: function() {
-          alert('Payment cancelled. You can try again.');
+          alert('Payment cancelled. Please try again.');
         }
       });
     }
   </script>
 </body>
-</html> 
+</html>
