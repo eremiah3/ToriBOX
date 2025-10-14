@@ -25,7 +25,7 @@
       border-radius: 5px;
       text-align: center;
     }
-    #payment-email {
+    #payment-name, #payment-email {
       width: 80%;
       padding: 10px;
       margin: 10px 0;
@@ -162,7 +162,8 @@
   <!-- Payment Modal -->
   <div id="payment-modal" class="modal">
     <div class="modal-content">
-      <h3>Enter Your Email for Payment</h3>
+      <h3>Enter Your Details for Payment</h3>
+      <input type="text" id="payment-name" placeholder="Your name" required>
       <input type="email" id="payment-email" placeholder="Your email" required>
       <div class="modal-buttons">
         <button onclick="proceedWithPayment()">Proceed</button>
@@ -258,20 +259,26 @@
 
     function closePaymentPopup() {
       document.getElementById('payment-modal').style.display = 'none';
+      document.getElementById('payment-name').value = '';
       document.getElementById('payment-email').value = '';
       document.getElementById('modal-status').innerText = '';
     }
 
     function proceedWithPayment() {
+      const nameInput = document.getElementById('payment-name');
       const emailInput = document.getElementById('payment-email');
+      const name = nameInput.value.trim();
       const email = emailInput.value.trim();
       const modalStatus = document.getElementById('modal-status');
 
-      if (!email) {
+      if (!name || !email) {
         modalStatus.style.color = "red";
-        modalStatus.innerText = "Please enter a valid email.";
+        modalStatus.innerText = "Please enter both name and email.";
         return;
       }
+
+      // Identify user in PostHog
+      posthog.identify(email, { name: name, email: email });
 
       modalStatus.style.color = "black";
       modalStatus.innerText = "Processing payment...";
@@ -285,29 +292,28 @@
         payment_options: 'card, bank, ussd, mobilemoneyghana, mobilemoneyuganda, mobilemoneyzambia, barter, nqr',
         customer: {
           email: email,
-          name: 'ToriBOX User'
+          name: name
         },
         meta: {
           coins: currentCoins,
           packName: currentPackName
         },
         callback: function (response) {
-          if (response.status === 'successful') {
-            const paymentDetails = {
-              email: email,
-              amount: currentAmount,
-              coins: currentCoins,
-              transactionId: response.transaction_id,
-              packName: currentPackName,
-              date: new Date().toISOString()
-            };
-            console.log('Payment Details:', paymentDetails);
-            alert(`Payment Successful!\nEmail: ${email}\nAmount: ₦${currentAmount}\nCoins: ${currentCoins}\nTransaction ID: ${response.transaction_id}`);
-          } else {
-            alert('Payment failed or was not completed.');
-          }
+          console.log('Flutterwave Response:', response); // Debug log
+          const paymentDetails = {
+            name: name,
+            email: email,
+            amount: currentAmount,
+            coins: currentCoins,
+            transactionId: response.transaction_id,
+            packName: currentPackName,
+            date: new Date().toISOString()
+          };
+          console.log('Payment Details:', paymentDetails);
+          alert(`Payment Successful!\nName: ${name}\nEmail: ${email}\nAmount: ₦${currentAmount}\nCoins: ${currentCoins}\nTransaction ID: ${response.transaction_id}`);
         },
         onClose: function() {
+          console.log('Payment modal closed');
           alert('Payment cancelled. Please try again.');
         }
       });
