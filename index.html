@@ -231,7 +231,7 @@
         if (!saveRes.ok) throw new Error("Failed to save to SheetDB.");
 
         // Identify user in PostHog
-        posthog.identify(email, { name: 'ToriBOX User' });
+        posthog.identify(email, { name: 'ToriBOX User', email: email });
 
         statusMsg.style.color = "green";
         statusMsg.innerText = "🎉 Thanks! You're on the waitlist. Check your inbox for confirmation.";
