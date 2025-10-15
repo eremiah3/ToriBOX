@@ -486,86 +486,79 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.9);
+  background-color: rgba(0,0,0,0.85);
   justify-content: center;
   align-items: center;
-  overflow: hidden; /* Prevent background scroll */
   backdrop-filter: blur(4px);
-  transition: opacity 0.3s ease;
 }
 
 .pdf-modal-content {
   position: relative;
   width: 90%;
-  max-width: 850px;
+  max-width: 800px;
   height: 85vh;
   background: #111;
-  border-radius: 12px;
-  overflow: hidden; /* Prevent internal scroll bounce */
-  box-shadow: 0 0 25px rgba(0,0,0,0.5);
+  border-radius: 10px;
+  overflow: hidden; /* prevent inner scrollbars causing shakes */
   display: flex;
   flex-direction: column;
   animation: fadeIn 0.3s ease;
+  box-shadow: 0 0 25px rgba(0,0,0,0.6);
 }
 
 .pdf-modal-content iframe {
+  flex: 1;
   width: 100%;
   height: 100%;
   border: none;
-  display: block;
-  background: #111; /* Dark background even while loading */
+  background: #111; /* prevents white background flash */
+  transform: scale(1); /* prevents zoom-in on mobile */
+  overflow: hidden;
 }
 
-/* ❌ Close Button */
 .close {
+  color: #fff;
   position: absolute;
   top: 12px;
   right: 18px;
-  font-size: 30px;
-  color: #fff;
-  cursor: pointer;
+  font-size: 28px;
   font-weight: bold;
+  cursor: pointer;
   z-index: 10;
+  line-height: 1;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.8);
   transition: color 0.3s ease;
-  text-shadow: 0 2px 6px rgba(0,0,0,0.7);
 }
 
 .close:hover {
   color: #ff4444;
 }
 
-/* ✅ MOBILE OPTIMIZATION */
+/* Fade animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* 📱 MOBILE OPTIMIZATION */
 @media (max-width: 600px) {
   .pdf-modal-content {
     width: 95%;
     height: 75vh;
-    max-width: 600px;
-    border-radius: 10px;
-    background: #111; /* ensure dark background */
+    border-radius: 8px;
+  }
+
+  .close {
+    top: 10px;
+    right: 14px;
+    font-size: 26px;
   }
 
   .pdf-modal-content iframe {
     width: 100%;
     height: 100%;
+    overflow: hidden;
     background: #111;
-  }
-
-  .close {
-    top: 8px;
-    right: 12px;
-    font-size: 26px;
-  }
-}
-
-/* 💫 Smooth Fade Animation */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
   }
 }
 
