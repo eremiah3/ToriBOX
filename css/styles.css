@@ -477,7 +477,7 @@ body {
       }
     }
 
-   /* ---------------- PDF MODAL ---------------- */
+  /* ---------------- PDF MODAL ---------------- */
 .pdf-modal {
   display: none;
   position: fixed;
@@ -489,35 +489,38 @@ body {
   background-color: rgba(0,0,0,0.85);
   justify-content: center;
   align-items: center;
-  overflow: auto; /* Allow scrolling if content exceeds */
+  overflow: hidden; /* Prevent unwanted scroll on body */
   backdrop-filter: blur(4px);
 }
 
 .pdf-modal-content {
   position: relative;
   width: 90%;
-  max-width: 700px; /* Reduced from 900px for better portability */
-  height: 80vh; /* Reduced from 90vh for readability */
+  max-width: 900px;
+  height: 90vh;
   background: #111;
   border-radius: 10px;
-  overflow: auto; /* Enable scrolling within modal */
+  overflow: hidden;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
 }
 
 .pdf-modal-content iframe {
   width: 100%;
   height: 100%;
   border: none;
-  object-fit: scale-down; /* Ensures PDF fits and is readable without overflow */
+  display: block;
+  transform: none; /* prevent shaky scaling */
+  object-fit: contain;
 }
 
 .close {
-  color: #fff; /* Changed from darkblue to white for better contrast */
+  color: #fff;
   position: absolute;
   top: 10px;
   right: 15px;
-  font-size: 28px; /* Slightly reduced for balance */
+  font-size: 28px;
   font-family: Arial, sans-serif;
   cursor: pointer;
   z-index: 10;
@@ -526,38 +529,28 @@ body {
 }
 
 .close:hover {
-  color: #ff4444; /* Bright red hover for visibility */
+  color: #ff4444;
 }
 
-/* 📱 MOBILE OPTIMIZATION */
+/* 📱 Keep same layout as desktop on mobile */
 @media (max-width: 600px) {
   .pdf-modal-content {
     width: 95%;
-    max-width: 600px; /* Further reduced for mobile */
-    height: 70vh; /* Reduced from 100vh for better readability */
-    border-radius: 8px;
+    max-width: 900px; /* same width behavior */
+    height: 90vh; /* same height behavior */
+    border-radius: 0; /* fullscreen clean edges */
   }
 
   .pdf-modal-content iframe {
     width: 100%;
     height: 100%;
+    transform: none; /* prevent shake and zoom */
   }
 
   .close {
-    top: 8px;
-    right: 10px;
-    font-size: 22px; /* Adjusted for mobile */
-  }
-}
-
-@media (max-width: 360px) {
-  .pdf-modal-content {
-    height: 65vh; /* Even smaller for very small screens */
-    max-width: 500px;
-  }
-
-  .close {
-    font-size: 18px; /* Further reduced */
+    top: 12px;
+    right: 15px;
+    font-size: 26px;
   }
 }
 

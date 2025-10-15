@@ -369,8 +369,20 @@
 function openPDFModal(pdfURL) {
   const modal = document.getElementById("pdfModal");
   const iframe = document.getElementById("pdfFrame");
-  iframe.src = pdfURL;
-  modal.style.display = "flex"; // Show modal (centered)
+  
+  // Clear iframe and show modal with loading state
+  iframe.src = "";
+  modal.style.display = "flex"; // Show modal
+  
+  // Delay to allow modal to render before loading PDF
+  setTimeout(() => {
+    iframe.src = pdfURL;
+  }, 150); // Increased delay for stability
+  
+  // Optional: Add load event to ensure stable rendering
+  iframe.onload = () => {
+    iframe.style.opacity = "1"; // Fade in once loaded (if styled)
+  };
 }
 
 function closePDFModal() {
@@ -378,6 +390,7 @@ function closePDFModal() {
   const iframe = document.getElementById("pdfFrame");
   iframe.src = "";
   modal.style.display = "none";
+  iframe.onload = null; // Clear event listener
 }
 </script>
 
