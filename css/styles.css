@@ -582,8 +582,8 @@ body {
 
 @media (max-width: 600px) {
   .pdf-modal-content {
-    width: 95%;
-    height: 85vh;
+    width: 90%;
+    height: 70vh;
   }
 }
 
