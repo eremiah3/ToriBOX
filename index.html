@@ -158,6 +158,32 @@
       </div>
     </div>
   </section>
+<footer class="site-footer">
+  <div class="footer-container">
+    <div class="footer-left">
+      <h2 class="footer-logo">Tori<span>BOX</span></h2>
+    </div>
+
+    <div class="footer-center">
+      <p>© 2025 ToriBOX. All rights reserved.</p>
+    </div>
+
+    <div class="footer-right">
+      <a href="#" onclick="openPDF('privacy.pdf')">Privacy Policy</a>
+      <a href="#" onclick="openPDF('Refund Policy.pdf')">Refund Policy</a>
+      <a href="#" onclick="openPDF('Terms & Conditions.pdf')">Terms & Condition</a>
+      <a href="mailto:hello@tori-box.com">Contact Us</a>
+    </div>
+  </div>
+</footer>
+
+<!-- PDF Modal -->
+<div id="pdfModal" class="pdf-modal">
+  <div class="pdf-modal-content">
+    <span class="close-btn" onclick="closePDF()">&times;</span>
+    <iframe id="pdfViewer" src="" frameborder="0"></iframe>
+  </div>
+</div>
 
   <!-- Payment Modal -->
   <div id="payment-modal" class="modal">
@@ -319,5 +345,17 @@
       });
     }
   </script>
+  <script>
+function openPDF(pdfPath) {
+  document.getElementById("pdfViewer").src = pdfPath;
+  document.getElementById("pdfModal").style.display = "flex";
+}
+
+function closePDF() {
+  document.getElementById("pdfModal").style.display = "none";
+  document.getElementById("pdfViewer").src = "";
+}
+</script>
+
 </body>
 </html>
