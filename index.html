@@ -158,6 +158,25 @@
       </div>
     </div>
   </section>
+
+<!-- 📱 App Download Section -->
+<section class="download-section">
+  <h2>Get the ToriBOX App</h2>
+  <p>Binge short dramas anytime, anywhere.</p>
+  
+  <div class="store-buttons">
+    <div class="store-coming">
+      <img src="playstore.png" alt="Google Play">
+      <span>Coming Soon</span>
+    </div>
+    <div class="store-coming">
+      <img src="appstore.png" alt="App Store">
+      <span>Coming Soon</span>
+    </div>
+  </div>
+</section>
+
+   <!-- 🌐 Footer -->
 <footer class="site-footer">
   <div class="footer-container">
     <div class="footer-left">
@@ -172,18 +191,19 @@
       <a href="#" onclick="openPDF('privacy.pdf')">Privacy Policy</a>
       <a href="#" onclick="openPDF('Refund Policy.pdf')">Refund Policy</a>
       <a href="#" onclick="openPDF('Terms & Conditions.pdf')">Terms & Condition</a>
-      <a href="mailto:hello@tori-box.com">Contact Us</a>
+      <a href="mailto:youremail@example.com">Contact Us</a>
     </div>
   </div>
 </footer>
 
-<!-- PDF Modal -->
+<!-- 📄 Modal Popup -->
 <div id="pdfModal" class="pdf-modal">
   <div class="pdf-modal-content">
-    <span class="close-btn" onclick="closePDF()">&times;</span>
+    <span class="close" onclick="closePDF()">&times;</span>
     <iframe id="pdfViewer" src="" frameborder="0"></iframe>
   </div>
 </div>
+
 
   <!-- Payment Modal -->
   <div id="payment-modal" class="modal">
@@ -345,16 +365,23 @@
       });
     }
   </script>
-  <script>
-function openPDF(pdfPath) {
-  document.getElementById("pdfViewer").src = pdfPath;
-  document.getElementById("pdfModal").style.display = "flex";
-}
+ <script>
+  function openPDF(file) {
+    document.getElementById('pdfViewer').src = file;
+    document.getElementById('pdfModal').style.display = 'block';
+  }
 
-function closePDF() {
-  document.getElementById("pdfModal").style.display = "none";
-  document.getElementById("pdfViewer").src = "";
-}
+  function closePDF() {
+    document.getElementById('pdfViewer').src = '';
+    document.getElementById('pdfModal').style.display = 'none';
+  }
+
+  window.onclick = function(event) {
+    const modal = document.getElementById('pdfModal');
+    if (event.target === modal) {
+      closePDF();
+    }
+  }
 </script>
 
 </body>
