@@ -103,7 +103,6 @@
       </div>
 
       <div class="pack-grid">
-        <!-- Day-One Pack -->
         <div class="pack-card">
           <h3>₦1,000</h3>
           <h4>Day-One Pack</h4>
@@ -111,8 +110,6 @@
           <p>Be part of the first wave of ToriBOX supporters</p>
           <button class="pay-btn" onclick="showPaymentPopup(1000, 'Day-One Pack', 100)">Buy Now</button>
         </div>
-
-        <!-- Super Fan Pack -->
         <div class="pack-card">
           <h3>₦2,500</h3>
           <h4>Super Fan Pack</h4>
@@ -120,8 +117,6 @@
           <p>Early supporter shoutout + exclusive sticker pack</p>
           <button class="pay-btn" onclick="showPaymentPopup(2500, 'Super Fan Pack', 300)">Buy Now</button>
         </div>
-
-        <!-- True Fan Pack -->
         <div class="pack-card">
           <h3>₦3,000</h3>
           <h4>True Fan Pack</h4>
@@ -140,22 +135,7 @@
         <div class="nollywood-text">
           <h2>ToriBOX.</h2>
           <p>Big stories. Small episodes. Endless drama.</p>
-          <!-- 📱 App Download Section -->
-          <!-- <div class="download-section">
-            <h2>Coming Soon</h2>
-
-            <div class="store-buttons">
-              <div class="store-coming">
-                <img src="playstore.png" alt="Google Play">
-                <span>PlayStore</span>
-              </div>
-              <div class="store-coming">
-                <img src="appstore.png" alt="App Store">
-                <span>AppStore</span>
-              </div>
-            </div>
-          </div>
-        </div> -->
+        </div>
         <div class="nollywood-image">
           <img src="phone-2.png" alt="App preview">
         </div>
@@ -175,35 +155,30 @@
   </section>
 
   <!-- 🌐 Footer -->
-<footer class="site-footer">
-  <div class="footer-container">
-    <div class="footer-left">
-      <h2 class="footer-logo">Tori<span>BOX</span></h2>
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-left">
+        <h2 class="footer-logo">Tori<span>BOX</span></h2>
+      </div>
+      <div class="footer-center">
+        <p>© 2025 ToriBOX. All rights reserved.</p>
+      </div>
+      <div class="footer-right">
+        <a href="#" onclick="openPDFModal('privacy.pdf')">Privacy Policy</a>
+        <a href="#" onclick="openPDFModal('Refund Policy.pdf')">Refund Policy</a>
+        <a href="#" onclick="openPDFModal('Terms & Conditions.pdf')">Terms & Conditions</a>
+        <a href="mailto:hello@tori-box.com">Contact Us</a>
+      </div>
     </div>
+  </footer>
 
-    <div class="footer-center">
-      <p>© 2025 ToriBOX. All rights reserved.</p>
-    </div>
-
-    <div class="footer-right">
-      <a href="#" onclick="openPDFModal('privacy.pdf')">Privacy Policy</a>
-      <a href="#" onclick="openPDFModal('Refund Policy.pdf')">Refund Policy</a>
-      <a href="#" onclick="openPDFModal('Terms & Conditions.pdf')">Terms & Conditions</a>
-      <a href="mailto:hello@tori-box.com">Contact Us</a>
+  <!-- PDF Modal -->
+  <div id="pdfModal" class="pdf-modal">
+    <div class="pdf-modal-content">
+      <span class="close" onclick="closePDFModal()">&times;</span>
+      <iframe id="pdfFrame" src=""></iframe>
     </div>
   </div>
-</footer>
-
-<!-- PDF Modal -->
-<div id="pdfModal" class="pdf-modal">
-  <div class="pdf-modal-content">
-    <span class="close" onclick="closePDFModal()">&times;</span>
-    <iframe id="pdfFrame" src=""></iframe>
-  </div>
-</div>
-
-
-
 
   <!-- Payment Modal -->
   <div id="payment-modal" class="modal">
@@ -221,12 +196,12 @@
 
   <!-- EmailJS -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-  <!-- Flutterwave Payment Script -->
-  <script src="https://checkout.flutterwave.com/v3.js"></script>
-  <script>
-    // Initialize EmailJS
-    emailjs.init("mm0hGZXC5mxVDnLGc"); // ✅ Your EmailJS public key
 
+  <!-- ✅ Paystack Script -->
+  <script src="https://js.paystack.co/v1/inline.js"></script>
+
+  <script>
+    emailjs.init("mm0hGZXC5mxVDnLGc");
     const form = document.getElementById("waitlist-form");
     const statusMsg = document.getElementById("statusMsg");
     const submitBtn = document.getElementById("submitBtn");
@@ -242,7 +217,6 @@
       statusMsg.innerText = "⏳ Checking waitlist...";
 
       try {
-        // 1️⃣ Check if email already exists in SheetDB
         const searchRes = await fetch(`${SHEETDB_URL}/search?user_email=${encodeURIComponent(email)}`);
         let existing = [];
         if (searchRes.status === 404) {
@@ -256,20 +230,18 @@
 
         if (existing.length > 0) throw new Error("⚠️ This email is already on the waitlist.");
 
-        // 2️⃣ Send emails: auto-reply to user + notify admin
         await emailjs.send("service_w60c5jf", "template_36f08lc", { 
           user_email: email,
           from_name: "ToriBOX Team",  
-          reply_to: "support@tori-box.com"
+          reply_to: "hello@tori-box.com"
         });
 
         await emailjs.send("service_w60c5jf", "template_kaa01dh", { 
           user_email: email,
           from_name: "ToriBOX Team",  
-          reply_to: "support@tori-box.com"
+          reply_to: "hello@tori-box.com"
         });
 
-        // 3️⃣ Save email to SheetDB
         const saveRes = await fetch(SHEETDB_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -277,7 +249,6 @@
         });
         if (!saveRes.ok) throw new Error("Failed to save to SheetDB.");
 
-        // Identify user in PostHog
         posthog.identify(email, { name: 'ToriBOX User', email: email });
 
         statusMsg.style.color = "green";
@@ -293,7 +264,6 @@
       }
     });
 
-    // Modal Functions
     let currentAmount, currentPackName, currentCoins;
     function showPaymentPopup(amount, packName, coins) {
       currentAmount = amount;
@@ -323,77 +293,63 @@
         return;
       }
 
-      // Identify user in PostHog
       posthog.identify(email, { name: name, email: email });
-
       modalStatus.style.color = "black";
       modalStatus.innerText = "Processing payment...";
       closePaymentPopup();
 
-      FlutterwaveCheckout({
-        public_key: 'FLWPUBK-c8dfd9660a2055246884fc85f1686c3d-X', // Replace with your Flutterwave public key
-        tx_ref: 'tori-box-' + Math.floor((Math.random() * 1000000000) + 1),
-        amount: currentAmount,
+      const handler = PaystackPop.setup({
+        key: 'pk_live_5b55a9d7b858c8aac55065c2f23765fc0160436e', // 🟩 replace with your Paystack public key
+        email: email,
+        amount: currentAmount * 100,
         currency: 'NGN',
-        payment_options: 'card, bank, ussd, mobilemoneyghana, mobilemoneyuganda, mobilemoneyzambia, barter, nqr',
-        customer: {
-          email: email,
-          name: name
+        ref: 'tori-box-' + Math.floor((Math.random() * 1000000000) + 1),
+        metadata: {
+          custom_fields: [
+            { display_name: "Customer Name", value: name },
+            { display_name: "Coin Pack", value: currentPackName },
+            { display_name: "Coins", value: currentCoins }
+          ]
         },
-        meta: {
-          coins: currentCoins,
-          packName: currentPackName
-        },
-        callback: function (response) {
-          console.log('Flutterwave Response:', response); // Debug log
+        callback: function(response) {
+          console.log('Paystack Response:', response);
           const paymentDetails = {
-            name: name,
-            email: email,
+            name,
+            email,
             amount: currentAmount,
             coins: currentCoins,
-            transactionId: response.transaction_id,
+            transactionId: response.reference,
             packName: currentPackName,
             date: new Date().toISOString()
           };
-          console.log('Payment Details:', paymentDetails);
-          alert(`Payment Successful!\nName: ${name}\nEmail: ${email}\nAmount: ₦${currentAmount}\nCoins: ${currentCoins}\nTransaction ID: ${response.transaction_id}`);
+          alert(`✅ Payment Successful!\nName: ${name}\nEmail: ${email}\nAmount: ₦${currentAmount}\nCoins: ${currentCoins}\nTransaction Ref: ${response.reference}`);
         },
         onClose: function() {
-          console.log('Payment modal closed');
-          alert('Payment cancelled. Please try again.');
+          alert('❌ Payment cancelled. Please try again.');
         }
       });
+
+      handler.openIframe();
     }
   </script>
-<script>
-function openPDFModal(pdfURL) {
-  const modal = document.getElementById("pdfModal");
-  const iframe = document.getElementById("pdfFrame");
-  
-  // Clear iframe and show modal with loading state
-  iframe.src = "";
-  modal.style.display = "flex"; // Show modal
-  
-  // Delay to allow modal to render before loading PDF
-  setTimeout(() => {
-    iframe.src = pdfURL;
-  }, 150); // Increased delay for stability
-  
-  // Optional: Add load event to ensure stable rendering
-  iframe.onload = () => {
-    iframe.style.opacity = "1"; // Fade in once loaded (if styled)
-  };
-}
 
-function closePDFModal() {
-  const modal = document.getElementById("pdfModal");
-  const iframe = document.getElementById("pdfFrame");
-  iframe.src = "";
-  modal.style.display = "none";
-  iframe.onload = null; // Clear event listener
-}
-</script>
+  <script>
+    function openPDFModal(pdfURL) {
+      const modal = document.getElementById("pdfModal");
+      const iframe = document.getElementById("pdfFrame");
+      iframe.src = "";
+      modal.style.display = "flex";
+      setTimeout(() => { iframe.src = pdfURL; }, 150);
+      iframe.onload = () => { iframe.style.opacity = "1"; };
+    }
 
-
+    function closePDFModal() {
+      const modal = document.getElementById("pdfModal");
+      const iframe = document.getElementById("pdfFrame");
+      iframe.src = "";
+      modal.style.display = "none";
+      iframe.onload = null;
+    }
+  </script>
 </body>
 </html>
