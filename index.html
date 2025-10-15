@@ -174,7 +174,7 @@
     </div>
   </section>
 
-   <!-- 🌐 Footer -->
+  <!-- 🌐 Footer -->
 <footer class="site-footer">
   <div class="footer-container">
     <div class="footer-left">
@@ -186,21 +186,23 @@
     </div>
 
     <div class="footer-right">
-      <a href="#" onclick="openPDF('privacy.pdf')">Privacy Policy</a>
-      <a href="#" onclick="openPDF('Refund Policy.pdf')">Refund Policy</a>
-      <a href="#" onclick="openPDF('Terms & Conditions.pdf')">Terms & Condition</a>
+      <a href="#" onclick="openPDFModal('privacy.pdf')">Privacy Policy</a>
+      <a href="#" onclick="openPDFModal('Refund Policy.pdf')">Refund Policy</a>
+      <a href="#" onclick="openPDFModal('Terms & Conditions.pdf')">Terms & Conditions</a>
       <a href="mailto:hello@tori-box.com">Contact Us</a>
     </div>
   </div>
 </footer>
 
-<!-- 📄 Modal Popup -->
+<!-- PDF Modal -->
 <div id="pdfModal" class="pdf-modal">
   <div class="pdf-modal-content">
-    <span class="close" onclick="closePDF()">&times;</span>
-    <iframe id="pdfViewer" src="" frameborder="0"></iframe>
+    <span class="close" onclick="closePDFModal()">&times;</span>
+    <iframe id="pdfFrame" src=""></iframe>
   </div>
 </div>
+
+
 
 
   <!-- Payment Modal -->
@@ -363,24 +365,22 @@
       });
     }
   </script>
- <script>
-  function openPDF(file) {
-    document.getElementById('pdfViewer').src = file;
-    document.getElementById('pdfModal').style.display = 'block';
-  }
+<script>
+function openPDFModal(pdfURL) {
+  const modal = document.getElementById("pdfModal");
+  const iframe = document.getElementById("pdfFrame");
+  iframe.src = pdfURL;
+  modal.style.display = "flex"; // Show modal (centered)
+}
 
-  function closePDF() {
-    document.getElementById('pdfViewer').src = '';
-    document.getElementById('pdfModal').style.display = 'none';
-  }
-
-  window.onclick = function(event) {
-    const modal = document.getElementById('pdfModal');
-    if (event.target === modal) {
-      closePDF();
-    }
-  }
+function closePDFModal() {
+  const modal = document.getElementById("pdfModal");
+  const iframe = document.getElementById("pdfFrame");
+  iframe.src = "";
+  modal.style.display = "none";
+}
 </script>
+
 
 </body>
 </html>
