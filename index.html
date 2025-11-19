@@ -139,6 +139,16 @@
     </div>
 </section>
 
+  <!-- HOW TORIBOX PAYS CREATORS -->
+  <section class="how-toribox-pays">
+    <div class="container">
+      <div class="how-toribox-content">
+        <h2>HOW TORIBOX PAYS CREATORS</h2>
+        <p>ToriBOX is built for one purpose: to empower African storytellers and help them earn from their creativity.</p>
+        <a href="creators.html" class="learn-more-btn">Learn More</a>
+      </div>
+    </div>
+  </section>
 
   <!-- NOLLYWOOD -->
   <section class="nollywood">
@@ -226,6 +236,8 @@
       <p id="modal-status" style="margin-top:10px; font-size:0.6rem;"></p>
     </div>
   </div>
+
+
 
   <!-- EmailJS -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
@@ -382,6 +394,18 @@
       iframe.src = "";
       modal.style.display = "none";
       iframe.onload = null;
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      const paymentModal = document.getElementById('payment-modal');
+      const pdfModal = document.getElementById('pdfModal');
+      if (event.target === paymentModal) {
+        closePaymentPopup();
+      }
+      if (event.target === pdfModal) {
+        closePDFModal();
+      }
     }
   </script>
 </body>
