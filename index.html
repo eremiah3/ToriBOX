@@ -95,38 +95,50 @@
   </section>
 
   <!-- COIN PACKS -->
-  <section class="coin-packs">
-    <div class="container">
-      <div class="section-header">
-        <h2>Already 1,000+ drama lovers signed up.<br>100+ have reserved coins</h2>
-        <p>Unlock premium content and support your favorite creators with ToriBOX Coins!</p>
-      </div>
+ <section class="subscription-section">
+    <h2 class="section-title">Choose Your Plan</h2>
+    <p class="section-subtitle">Unlock premium content with our monthly subscription plans!</p>
 
-      <div class="pack-grid">
-        <div class="pack-card">
-          <h3>₦1,000</h3>
-          <h4>Day-One Pack</h4>
-          <p class="coins">100 Coins</p>
-          <p>Be part of the first wave of ToriBOX supporters</p>
-          <button class="pay-btn" onclick="showPaymentPopup(1000, 'Day-One Pack', 100)">Buy Now</button>
+    <div class="plan-grid">
+
+        <!-- STANDARD PLAN -->
+        <div class="plan-card standard-card">
+            <h3 class="plan-title">ToriBOX<br><span>STANDARD</span></h3>
+
+            <h4 class="plan-price">₦3,000<span>/month</span></h4>
+
+            <ul class="plan-features">
+                <li>✓ Unlimited streaming</li>
+                <li>✓ No ads</li>
+                <li>✓ Early access (24 hours earlier)</li>
+                <li>✓ Standard quality</li>
+            </ul>
+
+            <button class="plan-btn" onclick="showPaymentPopup(3000, 'ToriBOX Standard', 1)">Join Now</button>
         </div>
-        <div class="pack-card">
-          <h3>₦2,500</h3>
-          <h4>Super Fan Pack</h4>
-          <p class="coins">300 Coins <span>(+20% bonus)</span></p>
-          <p>Early supporter shoutout + exclusive sticker pack</p>
-          <button class="pay-btn" onclick="showPaymentPopup(2500, 'Super Fan Pack', 300)">Buy Now</button>
+
+        <!-- PREMIUM PLUS PLAN -->
+        <div class="plan-card premium-card">
+            <div class="popular-badge">MOST POPULAR</div>
+
+            <h3 class="plan-title">ToriBOX<br><span>PREMIUM+</span></h3>
+
+            <h4 class="plan-price">₦5,000<span>/month</span></h4>
+
+            <ul class="plan-features">
+                <li>✓ Ultra early access (72 hours early)</li>
+                <li>✓ Premium-only bonus scenes</li>
+                <li>✓ Premium-only shows</li>
+                <li>✓ HD streaming</li>
+                <li>✓ Premium badge</li>
+            </ul>
+
+            <button class="plan-btn" onclick="showPaymentPopup(5000, 'ToriBOX Premium+', +1)">Join Now</button>
         </div>
-        <div class="pack-card">
-          <h3>₦3,000</h3>
-          <h4>True Fan Pack</h4>
-          <p class="coins">700 Coins <span>(+40% bonus)</span></p>
-          <p>Exclusive sticker pack + early previews of new series</p>
-          <button class="pay-btn" onclick="showPaymentPopup(3000, 'True Fan Pack', 700)">Buy Now</button>
-        </div>
-      </div>
+
     </div>
-  </section>
+</section>
+
 
   <!-- NOLLYWOOD -->
   <section class="nollywood">
@@ -187,6 +199,7 @@
         <a href="#" onclick="openPDFModal('privacy.pdf')">Privacy Policy</a>
         <a href="#" onclick="openPDFModal('Refund Policy.pdf')">Refund Policy</a>
         <a href="#" onclick="openPDFModal('Terms & Conditions.pdf')">Terms & Conditions</a>
+        <a href="https://forms.gle/mq3WqpNqNMzbH2Xi6">Content Submission</a>
         <a href="mailto:hello@tori-box.com">Contact Us</a>
       </div>
     </div>
