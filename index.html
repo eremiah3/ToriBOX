@@ -62,13 +62,39 @@
     analytics.page();
   }}();
 </script>
- <!-- Your Customer.io tracking script stays here -->
-  <script>
-    !function(){var i="cioanalytics", analytics=(window[i]=window[i]||[]);}
-    // ... rest of your Customer.io script
-  </script>
-</head>
-<body>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+  // Target your waitlist form specifically
+  var form = document.getElementById('waitlist-form');
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault(); // Prevent immediate submission
+
+    // Get the email from your form
+    var email = this.querySelector('input[type="email"]').value.trim();
+    if (!email) return;
+
+    // Identify the user in Customer.io
+    cioanalytics.identify(email, {
+      email: email,
+      createdAt: Math.floor(Date.now() / 1000)
+    });
+
+    // Track the form submission event
+    cioanalytics.track('waitlist_joined', {
+      formType: 'Waitlist Form'
+    });
+
+    console.log("Customer.io identify & track fired for email:", email);
+
+    // Now submit the form (optional: if using AJAX, you can handle submission manually)
+    this.submit();
+  });
+
+});
+</script>
+
 </head>
 <body>
   <!-- HERO -->
@@ -430,18 +456,6 @@
         closePDFModal();
       }
     }
-  </script>
-   <!-- Your page content and form here -->
-  <form id="waitlist-form">
-    <input type="email" name="user_email" required>
-    <!-- <input type="text" name="name"> -->
-    <button type="submit">Submit</button>
-  </form>
-   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      var form = document.querySelector('form');
-      // ... rest of the form tracking code
-    });
   </script>
 </body>
 </html>
