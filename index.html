@@ -46,21 +46,59 @@
         person_profiles: 'identified_only',
     })
   </script>
-  <script>
-  !function(){var i="cioanalytics", analytics=(window[i]=window[i]||[]);if(!analytics.initialize)if(analytics.invoked)window.console&&console.error&&console.error("Snippet included twice.");else{analytics.invoked=!0;analytics.methods=["trackSubmit","trackClick","trackLink","trackForm","pageview","identify","reset","group","track","ready","alias","debug","page","once","off","on","addSourceMiddleware","addIntegrationMiddleware","setAnonymousId","addDestinationMiddleware"];analytics.factory=function(e){return function(){var t=Array.prototype.slice.call(arguments);t.unshift(e);analytics.push(t);return analytics}};for(var e=0;e<analytics.methods.length;e++){var key=analytics.methods[e];analytics[key]=analytics.factory(key)}analytics.load=function(key,e){var t=document.createElement("script");t.type="text/javascript";t.async=!0;t.setAttribute('data-global-customerio-analytics-key', i);t.src="https://cdp.customer.io/v1/analytics-js/snippet/" + key + "/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(t,n);analytics._writeKey=key;analytics._loadOptions=e};analytics.SNIPPET_VERSION="4.15.3";
-    analytics.load(
-      "54bccebece62c9ea42df",
-      {
-        "integrations": {
-          "Customer.io In-App Plugin": {
-            anonymousInApp: true
-          }
-        }
+  <!-- CUSTOMER.IO SNIPPET -->
+<script>
+!function(){
+  var i="cioanalytics", analytics=(window[i]=window[i]||[]);
+  if(!analytics.initialize)
+    if(analytics.invoked)
+      window.console&&console.error&&console.error("Snippet included twice.");
+    else {
+      analytics.invoked=!0;
+      analytics.methods=[
+        "trackSubmit","trackClick","trackLink","trackForm","pageview","identify",
+        "reset","group","track","ready","alias","debug","page","once","off",
+        "on","addSourceMiddleware","addIntegrationMiddleware","setAnonymousId",
+        "addDestinationMiddleware"
+      ];
+      analytics.factory=function(e){return function(){
+        var t=Array.prototype.slice.call(arguments);
+        t.unshift(e);
+        analytics.push(t);
+        return analytics;
+      }};
+      for(var e=0;e<analytics.methods.length;e++){
+        analytics[analytics.methods[e]]=analytics.factory(analytics.methods[e])
       }
-    );
-    analytics.page();
-  }}();
+      analytics.load=function(key,e){
+        var t=document.createElement("script");
+        t.type="text/javascript";
+        t.async=!0;
+        t.setAttribute('data-global-customerio-analytics-key', i);
+        t.src="https://cdp.customer.io/v1/analytics-js/snippet/" + key + "/analytics.min.js";
+        var n=document.getElementsByTagName("script")[0];
+        n.parentNode.insertBefore(t,n);
+      };
+      analytics.SNIPPET_VERSION="4.15.3";
+      analytics.load("54bccebece62c9ea42df");
+      analytics.page();
+    }
+}();
 </script>
+
+<!-- HELPER FUNCTION TO TRACK EMAIL ONLY -->
+<script>
+function identifyEmailInCustomerIO(email) {
+  if (!email) {
+    console.warn("Customer.io: Email is missing");
+    return;
+  }
+  cioanalytics.identify(email, { email: email });
+  cioanalytics.track("waitlist_joined", { email: email });
+  console.log("Customer.io identify fired with email:", email);
+}
+</script>
+
 </head>
 <body>
   <!-- HERO -->
@@ -260,138 +298,163 @@
   <!-- ✅ Paystack Script -->
   <script src="https://js.paystack.co/v1/inline.js"></script>
 
-  <script>
-    emailjs.init("mm0hGZXC5mxVDnLGc");
-    const form = document.getElementById("waitlist-form");
-    const statusMsg = document.getElementById("statusMsg");
-    const submitBtn = document.getElementById("submitBtn");
-    const SHEETDB_URL = "https://sheetdb.io/api/v1/ip8mw6as947hf";
+ <script>
+emailjs.init("mm0hGZXC5mxVDnLGc");
 
-    form.addEventListener("submit", async function(e) {
-      e.preventDefault();
-      const email = document.getElementById("email").value.trim();
-      if (!email) return;
+const form = document.getElementById("waitlist-form");
+const statusMsg = document.getElementById("statusMsg");
+const submitBtn = document.getElementById("submitBtn");
+const SHEETDB_URL = "https://sheetdb.io/api/v1/ip8mw6as947hf";
 
-      submitBtn.disabled = true;
-      statusMsg.style.color = "black";
-      statusMsg.innerText = "⏳ Checking waitlist...";
+// Customer.io function for email-only identify
+function identifyEmailInCustomerIO(email) {
+  if (!email) {
+    console.warn("Customer.io: Email is missing");
+    return;
+  }
+  cioanalytics.identify(email, { email: email });
+  cioanalytics.track("waitlist_joined", { email: email });
+  console.log("Customer.io identify fired with email:", email);
+}
 
-      try {
-        const searchRes = await fetch(`${SHEETDB_URL}/search?user_email=${encodeURIComponent(email)}`);
-        let existing = [];
-        if (searchRes.status === 404) {
-          existing = [];
-        } else if (!searchRes.ok) {
-          throw new Error("Could not check waitlist. Try again later.");
-        } else {
-          const data = await searchRes.json();
-          existing = Array.isArray(data) ? data : (data.data || []);
-        }
+// Waitlist form submission
+form.addEventListener("submit", async function(e) {
+  e.preventDefault();
+  const email = document.getElementById("email").value.trim();
+  if (!email) return;
 
-        if (existing.length > 0) throw new Error("⚠️ This email is already on the waitlist.");
+  submitBtn.disabled = true;
+  statusMsg.style.color = "black";
+  statusMsg.innerText = "⏳ Checking waitlist...";
 
-        await emailjs.send("service_w60c5jf", "template_36f08lc", { 
-          user_email: email,
-          from_name: "ToriBOX Team",  
-          reply_to: "hello@tori-box.com"
-        });
+  try {
+    // Check if email already exists in SheetDB
+    const searchRes = await fetch(`${SHEETDB_URL}/search?user_email=${encodeURIComponent(email)}`);
+    let existing = [];
+    if (searchRes.status === 404) {
+      existing = [];
+    } else if (!searchRes.ok) {
+      throw new Error("Could not check waitlist. Try again later.");
+    } else {
+      const data = await searchRes.json();
+      existing = Array.isArray(data) ? data : (data.data || []);
+    }
 
-        await emailjs.send("service_w60c5jf", "template_kaa01dh", { 
-          user_email: email,
-          from_name: "ToriBOX Team",  
-          reply_to: "hello@tori-box.com"
-        });
+    if (existing.length > 0) throw new Error("⚠️ This email is already on the waitlist.");
 
-        const saveRes = await fetch(SHEETDB_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ data: { user_email: email } })
-        });
-        if (!saveRes.ok) throw new Error("Failed to save to SheetDB.");
-
-        posthog.identify(email, { name: 'ToriBOX User', email: email });
-
-        statusMsg.style.color = "green";
-        statusMsg.innerText = "🎉 Thanks! You're on the waitlist. Check your inbox for confirmation.";
-        form.reset();
-
-      } catch (err) {
-        console.error(err);
-        statusMsg.style.color = "red";
-        statusMsg.innerText = err.message || "❌ Something went wrong. Try again.";
-      } finally {
-        submitBtn.disabled = false;
-      }
+    // Send email via EmailJS
+    await emailjs.send("service_w60c5jf", "template_36f08lc", { 
+      user_email: email,
+      from_name: "ToriBOX Team",  
+      reply_to: "hello@tori-box.com"
+    });
+    await emailjs.send("service_w60c5jf", "template_kaa01dh", { 
+      user_email: email,
+      from_name: "ToriBOX Team",  
+      reply_to: "hello@tori-box.com"
     });
 
-    let currentAmount, currentPackName, currentCoins;
-    function showPaymentPopup(amount, packName, coins) {
-      currentAmount = amount;
-      currentPackName = packName;
-      currentCoins = coins;
-      document.getElementById('payment-modal').style.display = 'flex';
-      document.getElementById('payment-email').focus();
+    // Save email to SheetDB
+    const saveRes = await fetch(SHEETDB_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ data: { user_email: email } })
+    });
+    if (!saveRes.ok) throw new Error("Failed to save to SheetDB.");
+
+    // ✅ Customer.io email tracking
+    identifyEmailInCustomerIO(email);
+
+    // Optional: PostHog tracking
+    posthog.identify(email, { name: 'ToriBOX User', email: email });
+
+    statusMsg.style.color = "green";
+    statusMsg.innerText = "🎉 Thanks! You're on the waitlist. Check your inbox for confirmation.";
+    form.reset();
+
+  } catch (err) {
+    console.error(err);
+    statusMsg.style.color = "red";
+    statusMsg.innerText = err.message || "❌ Something went wrong. Try again.";
+  } finally {
+    submitBtn.disabled = false;
+  }
+});
+
+// Payment logic (unchanged)
+let currentAmount, currentPackName, currentCoins;
+function showPaymentPopup(amount, packName, coins) {
+  currentAmount = amount;
+  currentPackName = packName;
+  currentCoins = coins;
+  document.getElementById('payment-modal').style.display = 'flex';
+  document.getElementById('payment-email').focus();
+}
+
+function closePaymentPopup() {
+  document.getElementById('payment-modal').style.display = 'none';
+  document.getElementById('payment-name').value = '';
+  document.getElementById('payment-email').value = '';
+  document.getElementById('modal-status').innerText = '';
+}
+
+function proceedWithPayment() {
+  const nameInput = document.getElementById('payment-name');
+  const emailInput = document.getElementById('payment-email');
+  const name = nameInput.value.trim();
+  const email = emailInput.value.trim();
+  const modalStatus = document.getElementById('modal-status');
+
+  if (!name || !email) {
+    modalStatus.style.color = "red";
+    modalStatus.innerText = "Please enter both name and email.";
+    return;
+  }
+
+  // ✅ Customer.io for payment email
+  identifyEmailInCustomerIO(email);
+
+  // Optional: PostHog
+  posthog.identify(email, { name: name, email: email });
+
+  modalStatus.style.color = "black";
+  modalStatus.innerText = "Processing payment...";
+  closePaymentPopup();
+
+  const handler = PaystackPop.setup({
+    key: 'pk_live_5b55a9d7b858c8aac55065c2f23765fc0160436e',
+    email: email,
+    amount: currentAmount * 100,
+    currency: 'NGN',
+    ref: 'tori-box-' + Math.floor((Math.random() * 1000000000) + 1),
+    metadata: {
+      custom_fields: [
+        { display_name: "Customer Name", value: name },
+        { display_name: "Coin Pack", value: currentPackName },
+        { display_name: "Coins", value: currentCoins }
+      ]
+    },
+    callback: function(response) {
+      console.log('Paystack Response:', response);
+      const paymentDetails = {
+        name,
+        email,
+        amount: currentAmount,
+        coins: currentCoins,
+        transactionId: response.reference,
+        packName: currentPackName,
+        date: new Date().toISOString()
+      };
+      alert(`✅ Payment Successful!\nName: ${name}\nEmail: ${email}\nAmount: ₦${currentAmount}\nCoins: ${currentCoins}\nTransaction Ref: ${response.reference}`);
+    },
+    onClose: function() {
+      alert('❌ Payment cancelled. Please try again.');
     }
+  });
 
-    function closePaymentPopup() {
-      document.getElementById('payment-modal').style.display = 'none';
-      document.getElementById('payment-name').value = '';
-      document.getElementById('payment-email').value = '';
-      document.getElementById('modal-status').innerText = '';
-    }
-
-    function proceedWithPayment() {
-      const nameInput = document.getElementById('payment-name');
-      const emailInput = document.getElementById('payment-email');
-      const name = nameInput.value.trim();
-      const email = emailInput.value.trim();
-      const modalStatus = document.getElementById('modal-status');
-
-      if (!name || !email) {
-        modalStatus.style.color = "red";
-        modalStatus.innerText = "Please enter both name and email.";
-        return;
-      }
-
-      posthog.identify(email, { name: name, email: email });
-      modalStatus.style.color = "black";
-      modalStatus.innerText = "Processing payment...";
-      closePaymentPopup();
-
-      const handler = PaystackPop.setup({
-        key: 'pk_live_5b55a9d7b858c8aac55065c2f23765fc0160436e', // 🟩 replace with your Paystack public key
-        email: email,
-        amount: currentAmount * 100,
-        currency: 'NGN',
-        ref: 'tori-box-' + Math.floor((Math.random() * 1000000000) + 1),
-        metadata: {
-          custom_fields: [
-            { display_name: "Customer Name", value: name },
-            { display_name: "Coin Pack", value: currentPackName },
-            { display_name: "Coins", value: currentCoins }
-          ]
-        },
-        callback: function(response) {
-          console.log('Paystack Response:', response);
-          const paymentDetails = {
-            name,
-            email,
-            amount: currentAmount,
-            coins: currentCoins,
-            transactionId: response.reference,
-            packName: currentPackName,
-            date: new Date().toISOString()
-          };
-          alert(`✅ Payment Successful!\nName: ${name}\nEmail: ${email}\nAmount: ₦${currentAmount}\nCoins: ${currentCoins}\nTransaction Ref: ${response.reference}`);
-        },
-        onClose: function() {
-          alert('❌ Payment cancelled. Please try again.');
-        }
-      });
-
-      handler.openIframe();
-    }
-  </script>
+  handler.openIframe();
+}
+</script>
 
   <script>
     function openPDFModal(pdfURL) {
